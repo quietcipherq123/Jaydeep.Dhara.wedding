@@ -6,7 +6,8 @@ const CONFIG = {
   musicFile: "assets/wedding-music.mp3"
 };
 
-// Build the temple-night scene: stars, rows of diyas, water reflections and distant fireworks.
+// Build a dense, deliberately ordered lighting sequence. Every lamp is anchored
+// to a visible architectural edge, ghat tier, or the waterline (never scattered).
 const hero = document.querySelector(".temple-hero");
 const diyaContainer = document.getElementById("diyas");
 const reflectionContainer = document.getElementById("reflections");
@@ -17,32 +18,60 @@ let sceneStarted = false;
 let fireworksTimer = null;
 let sceneInView = true;
 
-// Percent coordinates are designed around the vertical temple/lake composition.
 const diyaPoints = [];
-// A line of lamps along the temple's water edge.
-for (let x = 7; x <= 94; x += 4.8) diyaPoints.push([x, 57 + Math.sin(x / 13) * 1.2]);
-// Curved tiers of the foreground ghat.
-for (let x = 78; x <= 99; x += 3.5) diyaPoints.push([x, 65 + (x - 78) * .42]);
-for (let x = 66; x <= 99; x += 3.4) diyaPoints.push([x, 73 + (x - 66) * .36]);
-for (let x = 52; x <= 98; x += 3.2) diyaPoints.push([x, 81 + (x - 52) * .28]);
-for (let x = 38; x <= 91; x += 3.1) diyaPoints.push([x, 89 + (x - 38) * .18]);
-// A few floating lights near the waterline.
-for (let x = 8; x <= 49; x += 6.8) diyaPoints.push([x, 88 + Math.sin(x / 8) * 2]);
+const addRow = (name, count, pointAt, reflect = false) => {
+  for (let i = 0; i < count; i++) {
+    const [x, y] = pointAt(i / Math.max(1, count - 1));
+    diyaPoints.push({ x, y, row: name, reflect });
+  }
+};
 
-diyaPoints.forEach(([x, y], index) => {
+// 1) Temple: lamps trace the shikhara, layered roofs, balconies and long arcade.
+addRow("temple-spire", 22, t => [10.2 + Math.sin(t * Math.PI) * 2.2, 29.8 + t * 13.8]);
+addRow("temple-upper-roof", 42, t => [13 + t * 68, 43.2 + Math.sin(t * Math.PI * 5) * 1.8]);
+addRow("temple-mid-roof", 48, t => [5 + t * 88, 48.8 + Math.sin(t * Math.PI * 6) * 1.4]);
+addRow("temple-balcony", 54, t => [4 + t * 91, 53.2 + Math.sin(t * Math.PI * 3) * .45]);
+addRow("temple-arches", 52, t => [7 + t * 86, 56.8 + Math.sin(t * Math.PI * 2) * .35]);
+addRow("temple-base", 48, t => [3 + t * 94, 60.1 + Math.sin(t * Math.PI * 2) * .25], true);
+
+// 2) Ghat: dense, continuous rows follow the curved stepped platforms from far to near.
+addRow("ghat-far", 24, t => [82 + t * 18, 64.2 + t * 4.0]);
+addRow("ghat-tier-2", 30, t => [74 + t * 26, 69.0 + t * 4.8]);
+addRow("ghat-tier-3", 34, t => [64 + t * 36, 74.0 + t * 5.0]);
+addRow("ghat-tier-4", 38, t => [53 + t * 47, 79.2 + t * 5.0]);
+addRow("ghat-tier-5", 42, t => [42 + t * 58, 84.4 + t * 5.0]);
+addRow("ghat-front", 44, t => [29 + t * 71, 90.0 + t * 7.0]);
+
+// 3) A separate, close-spaced procession along the lake edge. These lamps alone
+// cast water reflections; ghat and temple lamps glow on their actual surfaces.
+addRow("waterline", 52, t => [3 + t * 94, 62.3 + Math.sin(t * Math.PI * 2) * .18], true);
+
+const lampElements = [];
+const reflectionElements = [];
+const fragment = document.createDocumentFragment();
+const reflectionFragment = document.createDocumentFragment();
+
+diyaPoints.forEach(({ x, y, row, reflect }, index) => {
   const diya = document.createElement("span");
-  diya.className = "scene-diya";
+  diya.className = `scene-diya ${row}`;
   diya.style.left = `${x}%`;
   diya.style.top = `${y}%`;
   diya.dataset.index = String(index);
-  diyaContainer.appendChild(diya);
-  const reflection = document.createElement("span");
-  reflection.className = "diya-reflection";
-  reflection.style.left = `${x}%`;
-  reflection.style.top = `${Math.min(98, y + (y < 64 ? 3.5 : 2.2))}%`;
-  reflection.style.animationDelay = `${Math.random() * 2}s`;
-  reflectionContainer.appendChild(reflection);
+  fragment.appendChild(diya);
+  lampElements.push(diya);
+
+  if (reflect) {
+    const reflection = document.createElement("span");
+    reflection.className = "diya-reflection";
+    reflection.style.left = `${x}%`;
+    reflection.style.top = `${Math.min(98, y + 2.0)}%`;
+    reflection.style.setProperty("--reflection-delay", `${(index % 7) * .17}s`);
+    reflectionFragment.appendChild(reflection);
+    reflectionElements.push({ element: reflection, lampIndex: index });
+  }
 });
+diyaContainer.appendChild(fragment);
+reflectionContainer.appendChild(reflectionFragment);
 
 for (let i = 0; i < 75; i++) {
   const star = document.createElement("span");
@@ -78,56 +107,43 @@ function scheduleFireworks() {
 function lightScene() {
   if (sceneStarted) return;
   sceneStarted = true;
-  hero.classList.add("is-lit");
+  hero.classList.add("is-lit", "lighting-sequence");
   document.getElementById("enterBtn").disabled = true;
-  const lamps = [...document.querySelectorAll(".scene-diya")];
-  const reflections = [...document.querySelectorAll(".diya-reflection")];
-  const stagger = reducedMotion ? 0 : 44;
-  lamps.forEach((lamp, i) => {
+
+  // Ignite every lamp in a steady procession. Dense rows make the whole temple
+  // and every visible ghat tier come alive, rather than isolated random points.
+  const stagger = reducedMotion ? 0 : 30;
+  const reflectionByLamp = new Map(reflectionElements.map(item => [item.lampIndex, item.element]));
+  lampElements.forEach((lamp, i) => {
     window.setTimeout(() => {
       lamp.classList.add("lit");
-      if (reflections[i]) reflections[i].classList.add("lit");
+      const reflection = reflectionByLamp.get(i);
+      if (reflection) reflection.classList.add("lit");
     }, i * stagger);
   });
-  // The temple and ghat glow first; fireworks and the invitation reveal follow.
-  window.setTimeout(() => hero.classList.add("temple-bright"), 950);
+
+  // Architecture brightens in layers as the lamp procession travels across it.
+  window.setTimeout(() => hero.classList.add("temple-bright"), 650);
+  const sequenceDuration = lampElements.length * stagger;
   window.setTimeout(() => {
-    if (sceneInView) {
-      scheduleFireworks();
-      sparkleRandomDiyas();
-    }
-  }, 1850);
-  window.setTimeout(() => hero.classList.add("names-visible"), Math.max(2600, lamps.length * stagger + 450));
+    hero.classList.add("all-diyas-lit");
+    if (sceneInView) scheduleFireworks();
+  }, sequenceDuration + 250);
+  window.setTimeout(() => hero.classList.add("names-visible"), sequenceDuration + 900);
   const music = document.getElementById("bgMusic");
   if (music && !music.paused) music.play().catch(() => {});
 }
-
 document.getElementById("enterBtn").addEventListener("click", lightScene);
 
 // One or two individual flames briefly brighten at random, like stars on the ghat.
-let sparkleTimer = null;
-function sparkleRandomDiyas() {
-  if (!sceneStarted || !sceneInView) return;
-  const lamps = [...document.querySelectorAll(".scene-diya.lit")];
-  if (lamps.length) {
-    const lamp = lamps[Math.floor(Math.random() * lamps.length)];
-    lamp.classList.add("sparkle");
-    window.setTimeout(() => lamp.classList.remove("sparkle"), 1150);
-  }
-  sparkleTimer = window.setTimeout(sparkleRandomDiyas, 380 + Math.random() * 900);
-}
-
 // Keep the living temple scene running only while the opening section remains on screen.
 const heroObserver = new IntersectionObserver(entries => {
   sceneInView = entries[0].isIntersecting;
   if (!sceneInView) {
     if (fireworksTimer) clearTimeout(fireworksTimer);
-    if (sparkleTimer) clearTimeout(sparkleTimer);
     fireworksTimer = null;
-    sparkleTimer = null;
   } else if (sceneInView && sceneStarted) {
     if (!fireworksTimer) scheduleFireworks();
-    if (!sparkleTimer) sparkleRandomDiyas();
   }
 }, { threshold: 0.12 });
 heroObserver.observe(hero);

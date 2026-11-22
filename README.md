@@ -1,6 +1,12 @@
-# Jaydeep & Dhara – Wedding Website
+# Jaydeep & Dhara – Wedding Website (Version 2)
 
 A free, responsive wedding invitation website built with plain HTML, CSS and JavaScript.
+
+## Version 2 opening-scene update
+
+The opening scene now uses a dense, ordered diya-lighting procession: lamps illuminate in continuous rows across the temple architecture, the waterline and the curved ghat tiers. The waterline lamps receive corresponding animated reflections. The sequence completes before the names reveal, and fireworks continue intermittently while the opening scene is visible. The flames are designed to sit inside the diya bowls rather than appear as scattered floating lights.
+
+To publish this update, replace the existing `index.html`, `style.css`, `script.js`, and `README.md` in the GitHub repository with the files from this ZIP. Keep the `assets` folder. Then wait for GitHub Pages to redeploy and refresh the website.
 
 ## Included
 - Deepotsav-inspired animated opening scene (CSS temple silhouette, stars and glowing diyas)

@@ -90,3 +90,45 @@ body.has-js .gate-seam{animation:seamFade .5s ease 1.8s forwards}
 .scene-diya.sparkle:before{animation:flameSparkle .55s ease-in-out 2!important;filter:drop-shadow(0 0 10px #fff0a8)}
 @keyframes flameSparkle{0%,100%{transform:translateX(-50%) scaleY(.85);filter:brightness(1)}45%{transform:translateX(-50%) scaleY(1.45);filter:brightness(1.7)}}
 @keyframes waterGlide{from{transform:translateX(-3%) scaleY(.95);opacity:.45}to{transform:translateX(4%) scaleY(1.05);opacity:1}}
+
+/* Version 2: dense, architectural diya procession. Flames sit inside the bowls. */
+.scene-diya{
+  width:clamp(9px,1.65vw,16px);height:clamp(5px,.85vw,9px);
+  border-radius:48% 48% 42% 42%;
+  background:radial-gradient(ellipse at 50% 18%,#bd8650 0 24%,#8b4d28 48%,#3b2118 82%);
+  border:1px solid rgba(225,165,91,.35);
+  box-shadow:0 2px 3px rgba(0,0,0,.8),inset 0 1px 1px rgba(255,216,159,.25);
+  opacity:.96;z-index:2;
+}
+.scene-diya:before{
+  left:50%;bottom:32%;width:clamp(5px,.72vw,8px);height:clamp(8px,1.35vw,14px);
+  transform:translateX(-50%) scale(.05);transform-origin:bottom;
+  border-radius:75% 15% 75% 15%;
+  background:radial-gradient(ellipse at 48% 70%,#fffef0 0 13%,#ffe49a 27%,#ffb642 54%,#ed681d 78%,transparent 100%);
+  filter:drop-shadow(0 0 4px #ffbd54);opacity:0;
+  transition:transform .28s ease,opacity .28s ease;
+}
+.scene-diya.lit:before{transform:translateX(-50%) scale(1);opacity:1;animation:flameDance 1.05s ease-in-out infinite alternate}
+.scene-diya.lit{box-shadow:0 0 8px 2px rgba(255,173,77,.3),inset 0 1px 1px rgba(255,216,159,.3)}
+/* Temple rows are slightly smaller and tucked onto the rooflines/arcades. */
+.scene-diya.temple-spire,.scene-diya.temple-upper-roof,.scene-diya.temple-mid-roof,
+.scene-diya.temple-balcony,.scene-diya.temple-arches,.scene-diya.temple-base{
+  width:clamp(6px,1.05vw,11px);height:clamp(4px,.58vw,6px);
+}
+.scene-diya.temple-spire:before,.scene-diya.temple-upper-roof:before,
+.scene-diya.temple-mid-roof:before,.scene-diya.temple-balcony:before,
+.scene-diya.temple-arches:before,.scene-diya.temple-base:before{
+  width:clamp(4px,.55vw,6px);height:clamp(7px,1vw,11px);bottom:30%;
+}
+.diya-reflection{
+  width:clamp(7px,1.15vw,12px);height:clamp(12px,2.4vw,24px);
+  background:linear-gradient(180deg,rgba(255,224,157,.92),rgba(255,174,75,.35) 42%,transparent 100%);
+  filter:blur(2.2px);opacity:0;animation:waterWaver 2.8s ease-in-out infinite alternate;
+  animation-delay:var(--reflection-delay,0s);
+}
+.diya-reflection.lit{opacity:.78}
+.temple-hero.temple-bright .temple-art{filter:brightness(1.35) saturate(1.2);}
+.temple-hero.all-diyas-lit .temple-glow{opacity:1}
+.temple-hero.all-diyas-lit .water-shimmer{opacity:.95}
+@keyframes flameDance{0%{filter:drop-shadow(0 0 3px #ffb43f);transform:translateX(-50%) scale(.92) rotate(-3deg)}100%{filter:drop-shadow(0 0 8px #ffe09a);transform:translateX(-50%) scale(1.08) rotate(3deg)}}
+@media(prefers-reduced-motion:reduce){.scene-diya.lit:before{animation:none!important}}
