@@ -92,3 +92,10 @@ The print stylesheet creates a simplified printable invitation. For a full-page 
 
 ## Important placeholders
 No exact function times, venue names/addresses, personal photos, music file, RSVP email or Google Form URL were available in the brief. They are deliberately left for you to fill in rather than guessed.
+
+
+## Cinematic temple opening (latest update)
+
+The opening scene now uses an original, generated temple-and-lake artwork embedded directly in `style.css`, designed around the supplied visual reference: a carved North Indian temple, reflective water, and a curved multi-tier ghat in the foreground. The first tap lights rows of diyas sequentially, reveals their water reflections, brightens the temple scene, starts intermittent distant fireworks, and then reveals the couple's names. Individual flames briefly sparkle at random while the opening scene remains in view. The fireworks and random flame effects pause after the guest scrolls away from the opening scene.
+
+The image is an original visual interpretation, not a pixel-perfect reconstruction of the reference site's proprietary artwork or an actual 3D model of its exact temple.
