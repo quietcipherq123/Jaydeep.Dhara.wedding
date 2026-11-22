@@ -1,9 +1,17 @@
-JAYDEEP & DHARA WEDDING WEBSITE - FRESH REFERENCE-INSPIRED BUILD
+JAYDEEP & DHARA — WEDDING INVITATION WEBSITE
 
-Upload index.html, style.css, script.js and the assets folder to the ROOT of your GitHub Pages repository (replace the previous files).
+Preview locally: open index.html in a modern browser.
+Deploy: upload the entire folder to GitHub Pages, Netlify, or any static hosting provider.
 
-Opening animation: tap "Tap to illuminate". The ghat and temple diya rows light in sequence, then fireworks begin. The invitation scrolls below.
+This is a first implementation of the supplied video’s long-scroll structure and visual direction.
+The source video is a screen recording, so the hero temple image is cropped from the supplied reference; sample couple photos, deity artwork and venue artwork are represented by editable placeholders rather than falsely presented as original assets.
 
-Important: This is a first functional visual build, not a pixel-perfect copy. The scene artwork is original. Lamp coordinates are aligned to this artwork and may need a final visual adjustment after testing on your phone.
+Before publishing, update:
+1. Exact event dates, timings and venues in index.html.
+2. Google Maps destination link.
+3. RSVP WhatsApp number and message handler.
+4. Add approved couple photographs in assets and replace the photo placeholder blocks.
+5. Add a licensed wedding-song file at assets/wedding-song.mp3 and wire its source in the audio element.
+6. Replace the symbolic deity and palace placeholders with approved artwork.
 
-Before publishing final details, provide exact venue name/address and each function's date/time. The current invitation uses the known wedding dates and family names; timings and venue are placeholders.
+All design and content are editable in index.html and styles are in its <style> block.
